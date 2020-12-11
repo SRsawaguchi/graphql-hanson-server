@@ -20,3 +20,11 @@ go mod init
 gqlgen init
 ```
 
+## Schemaを書き換える
+
+`/graph/schema.graphql`にスキーマを定義する。  
+定義した後、以下のコマンドを実行してコードを自動生成する。  
+
+```
+gqlgen generate
+```
