@@ -28,3 +28,27 @@ gqlgen init
 ```
 gqlgen generate
 ```
+
+## resolverを書き換える
+
+`/graph/schema.resolvers.go`を書き換える。  
+そして、 `go run server.go`を実行してサーバを起動する。  
+
+サンプルでは、`Links()`メソッドを書きかえ。（commitログ参照)
+
+## playground経由で実行
+ブラウザで`http://localhost:8080`にアクセスし、playgroundから以下のようなクエリを送信する。  
+
+```
+query {
+	links{
+    title
+    address,
+    user{
+      name
+    }
+  }
+}
+```
+
+指定したデータが得られる事を確認する。
