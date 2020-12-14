@@ -71,3 +71,19 @@ mutation {
   }
 }
 ```
+
+## RDB(PostgreSQL)のセットアップ
+
+### RDBMSの起動
+以下のコマンドを利用してPostgreSQLのコンテナを起動する。  
+
+```
+make rundb
+```
+
+※一度`make rundb`したら、`make stopdb`で停止、`make startdb`で再起動できる。  
+
+### マイグレーション
+```
+make migrate
+```
