@@ -12,6 +12,8 @@ import (
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/generated"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/model"
 	"github.com/SRsawaguchi/graphql-hanson-server/internal/links"
+	"github.com/SRsawaguchi/graphql-hanson-server/internal/users"
+	"github.com/SRsawaguchi/graphql-hanson-server/pkg/jwt"
 )
 
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
@@ -33,7 +35,21 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) 
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	user := users.User{
+		Username: input.Username,
+		Password: input.Password,
+	}
+	_, err := user.Create(ctx, r.DB)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	token, err := jwt.GenerateToken(user.Username)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {

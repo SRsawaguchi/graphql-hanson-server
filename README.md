@@ -158,3 +158,25 @@ query {
   }
 }
 ```
+
+## Authentication
+今回はJWTを使って認証を実装する。  
+※シンプルなルータとして、[chi](https://github.com/go-chi/chi)を利用する。  
+
+以下のリクエストを送信して、ユーザが登録される事を確認する。  
+
+```
+mutation {
+  createUser(input: {username: "user1", password: "123"})
+}
+```
+
+以下のようなレスポンスが得られる。  
+
+```
+{
+  "data": {
+    "createUser": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwMjQ1NjQsInVzZXJuYW1lIjoidXNlcjEifQ.xBbj4kPIRhyS4ZQejdnFRnjVEv8oE0wql0cQdCDZLc0"
+  }
+}
+```

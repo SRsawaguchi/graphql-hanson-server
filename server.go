@@ -11,13 +11,14 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/generated"
+	"github.com/SRsawaguchi/graphql-hanson-server/internal/auth"
+	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4"
 )
 
 const defaultPort = "8080"
 
 func connectDB(ctx context.Context) (*pgx.Conn, error) {
-
 	url := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -53,9 +54,12 @@ func main() {
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	router := chi.NewRouter()
+	router.Use(auth.Middleware(conn))
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
