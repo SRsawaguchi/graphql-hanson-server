@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,9 +11,30 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/generated"
+	"github.com/jackc/pgx/v4"
 )
 
 const defaultPort = "8080"
+
+func connectDB(ctx context.Context) (*pgx.Conn, error) {
+
+	url := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+	)
+
+	// データベースにとのコネクションを確立
+	conn, err := pgx.Connect(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn, nil
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -19,7 +42,16 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	resolver := &graph.Resolver{}
+	conn, err := connectDB(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+		os.Exit(1)
+	}
+	defer conn.Close(context.Background())
+	resolver.DB = conn
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

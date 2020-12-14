@@ -5,6 +5,15 @@ DB_PORT := 3306
 DB_USER := hackernews_app
 DB_NAME := hackernews
 
+.PHONY: run
+run:
+	env DB_HOST=$(DB_HOST) \
+		DB_PORT=$(DB_PORT) \
+		DB_PASSWORD=$(DB_PASS) \
+		DB_USER=$(DB_USER) \
+		DB_NAME=$(DB_NAME) \
+		go run server.go
+
 .PHONY: rundb
 rundb:
 	docker run -d \

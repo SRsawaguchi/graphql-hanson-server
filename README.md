@@ -33,6 +33,7 @@ gqlgen generate
 
 `/graph/schema.resolvers.go`を書き換える。  
 そして、 `go run server.go`を実行してサーバを起動する。  
+※DB接続用の情報を読み出すため、`make run`で実行してください。  
 
 サンプルでは、`Links()`メソッドを書きかえ。（commitログ参照)
 
@@ -53,7 +54,7 @@ query {
 
 指定したデータが得られる事を確認する。
 
-## mutations
+## Mutations
 `graph/schema.resolvers.go`を編集する。  
 ここでは、`CreateLink()`を編集する。  
 ※最初はstaticなデータを生成して返すように実装し、クライアント側（playground）から呼び出せることを確認しよう。  
@@ -86,4 +87,37 @@ make rundb
 ### マイグレーション
 ```
 make migrate
+```
+
+## Mutation（RDBMS)
+以下のコマンドでサーバを起動する。
+
+```
+make run
+```
+
+playground経由で以下のリクエストを送る。  
+
+```
+mutation create{
+  createLink(input: {title: "something", address: "somewhere"}){
+    title,
+    address,
+    id,
+  }
+}
+```
+
+すると、以下のような結果が得られ、データベースにレコードが追加される。  
+
+```
+{
+  "data": {
+    "createLink": {
+      "title": "something",
+      "address": "somewhere",
+      "id": "1"
+    }
+  }
+}
 ```

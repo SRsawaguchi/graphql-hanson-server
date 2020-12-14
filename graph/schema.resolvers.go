@@ -6,19 +6,30 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
+	"strconv"
 
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/generated"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/model"
+	"github.com/SRsawaguchi/graphql-hanson-server/internal/links"
 )
 
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	var link model.Link
-	var user model.User
-	link.Address = input.Address
-	link.Title = input.Title
-	user.Name = "test"
-	link.User = &user
-	return &link, nil
+	link := links.Link{
+		Title:   input.Title,
+		Address: input.Address,
+	}
+	_, err := link.Save(ctx, r.DB)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &model.Link{
+		ID:      strconv.Itoa(int(link.ID)),
+		Title:   link.Title,
+		Address: link.Address,
+	}, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
