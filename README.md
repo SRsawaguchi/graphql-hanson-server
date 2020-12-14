@@ -121,3 +121,40 @@ mutation create{
   }
 }
 ```
+
+## Query (RDBMS)
+`graph/schema.resolvers.go`を編集する。  
+ここでは、`Links()`を編集する。  
+
+以下のリクエストをする。  
+
+```
+query {
+  links {
+    title
+    address
+    id
+  }
+}
+```
+
+以下のような結果が返ってくることを確認する。
+
+```
+{
+  "data": {
+    "links": [
+      {
+        "title": "something",
+        "address": "somewhere",
+        "id": "1"
+      },
+      {
+        "title": "TEST",
+        "address": "some addr",
+        "id": "2"
+      }
+    ]
+  }
+}
+```

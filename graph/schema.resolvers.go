@@ -45,13 +45,20 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 }
 
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	var links []*model.Link
-	dummyLink := model.Link{
-		Title:   "our dummy link",
-		Address: "https://address.org",
-		User:    &model.User{Name: "admin"},
+	resultLinks, err := links.GetAll(ctx, r.DB)
+	if err != nil {
+		log.Println(err.Error())
+		return []*model.Link{}, err
 	}
-	links = append(links, &dummyLink)
+
+	links := []*model.Link{}
+	for _, link := range resultLinks {
+		links = append(links, &model.Link{
+			ID:      strconv.Itoa(int(link.ID)),
+			Title:   link.Title,
+			Address: link.Address,
+		})
+	}
 
 	return links, nil
 }
