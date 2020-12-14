@@ -29,6 +29,8 @@ gqlgen init
 gqlgen generate
 ```
 
+※この後スキーマを編集した場合も`gqlgen generate`を実行すればOK。すでに書いたメソッドが削除されることは無い。  
+
 ## resolverを書き換える
 
 `/graph/schema.resolvers.go`を書き換える。  
@@ -177,6 +179,44 @@ mutation {
 {
   "data": {
     "createUser": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwMjQ1NjQsInVzZXJuYW1lIjoidXNlcjEifQ.xBbj4kPIRhyS4ZQejdnFRnjVEv8oE0wql0cQdCDZLc0"
+  }
+}
+```
+
+### ログイン
+以下のようなリクエストになる。
+
+```
+mutation {
+  login(input: {username: "user1", password: "123"})
+}
+```
+
+以下のようなリクエストになる。  
+
+```
+{
+  "data": {
+    "login": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwMjY3MTMsInVzZXJuYW1lIjoidXNlcjEifQ.UqWqr4px-o0r72htUO1khlu5-07j658kwMEop5u49xI"
+  }
+}
+```
+
+### トークンの更新
+以下のようなリクエストになる。
+
+```
+mutation {
+  refreshToken(input: {Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwMjY3MTMsInVzZXJuYW1lIjoidXNlcjEifQ.UqWqr4px-o0r72htUO1khlu5-07j658kwMEop5u49xI"})
+}
+```
+
+以下のような結果になる。  
+
+```
+{
+  "data": {
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwMjYzNzQsInVzZXJuYW1lIjoidXNlcjEifQ._QnIHTlc5-GSQlD1ouTZCR0cvZJRwXJ6eqARwfOF2wg"
   }
 }
 ```

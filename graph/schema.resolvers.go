@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 
@@ -53,11 +52,41 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	user := users.User{
+		Username: input.Username,
+		Password: input.Password,
+	}
+	correct, err := user.Authenticate(ctx, r.DB)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	if !correct {
+		err := &users.WrongUsernameOrPasswordError{}
+		log.Println(err)
+		return "", err
+	}
+
+	token, err := jwt.GenerateToken(user.Username)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	username, err := jwt.ParseToken(input.Token)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	token, err := jwt.GenerateToken(username)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {

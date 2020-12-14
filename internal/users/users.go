@@ -59,3 +59,19 @@ func GetUserIdByUsername(ctx context.Context, conn *pgx.Conn, username string) (
 	}
 	return id, nil
 }
+
+func (u *User) Authenticate(ctx context.Context, conn *pgx.Conn) (bool, error) {
+	query := `SELECT Password FROM Users WHERE Username = $1`
+	hashedPw := ""
+
+	err := conn.QueryRow(
+		ctx,
+		query,
+		u.Username,
+	).Scan(&hashedPw)
+	if err != nil {
+		return false, err
+	}
+
+	return CheckPasswordHash(u.Password, hashedPw), nil
+}

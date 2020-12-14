@@ -24,8 +24,7 @@ input NewLink {
 }
 
 input RefreshTokenInput {
-  username: String!
-  password: String!
+  Token: String!
 }
 
 input NewUser {
