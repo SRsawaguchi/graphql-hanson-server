@@ -52,3 +52,22 @@ query {
 ```
 
 指定したデータが得られる事を確認する。
+
+## mutations
+`graph/schema.resolvers.go`を編集する。  
+ここでは、`CreateLink()`を編集する。  
+※最初はstaticなデータを生成して返すように実装し、クライアント側（playground）から呼び出せることを確認しよう。  
+
+実装できたら、playgroundから以下のようなリクエストを送り、上記で設定したレスポンスが返ってくるかどうか確認しよう。  
+
+```
+mutation {
+  createLink(input: { title: "new link", address: "http://address.org" }) {
+    title
+    user {
+      name
+    }
+    address
+  }
+}
+```
