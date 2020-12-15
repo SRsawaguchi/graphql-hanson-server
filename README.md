@@ -5,6 +5,9 @@ GraphQLを試してみる。
 参考  
 https://www.howtographql.com/graphql-go/0-introduction/
 
+※クライアントは以下のリポジトリにある。クライアントはこのサーバを利用する。  
+https://github.com/SRsawaguchi/graphql-hanson-client
+
 ## gqlgenのインストール
 https://github.com/99designs/gqlgen  
 `gqlgen`はGoでGraphQLサーバを開発するためのライブラリや各種ツール。  
