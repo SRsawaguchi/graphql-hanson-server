@@ -15,12 +15,12 @@ type Link struct {
 }
 
 func (l *Link) Save(ctx context.Context, conn *pgx.Conn) (int64, error) {
-	query := `INSERT INTO Links (Title, Address) VALUES ($1, $2) RETURNING ID`
+	query := `INSERT INTO Links (Title, Address, UserID) VALUES ($1, $2, $3) RETURNING ID`
 
 	err := conn.QueryRow(
 		ctx,
 		query,
-		l.Title, l.Address,
+		l.Title, l.Address, l.User.ID,
 	).Scan(&l.ID)
 
 	if err != nil {
@@ -31,7 +31,11 @@ func (l *Link) Save(ctx context.Context, conn *pgx.Conn) (int64, error) {
 }
 
 func GetAll(ctx context.Context, conn *pgx.Conn) ([]*Link, error) {
-	query := `SELECT ID, Title, Address FROM Links`
+	query := `
+SELECT
+	L.ID, L.Title, L.Address, U.ID, U.Username
+FROM Links L
+	INNER JOIN Users U ON L.UserID = U.ID`
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		return []*Link{}, err
@@ -40,7 +44,14 @@ func GetAll(ctx context.Context, conn *pgx.Conn) ([]*Link, error) {
 	links := []*Link{}
 	for rows.Next() {
 		link := &Link{}
-		err := rows.Scan(&link.ID, &link.Title, &link.Address)
+		link.User = &users.User{}
+		err := rows.Scan(
+			&link.ID,
+			&link.Title,
+			&link.Address,
+			&link.User.ID,
+			&link.User.Username,
+		)
 		if err != nil {
 			return []*Link{}, err
 		}

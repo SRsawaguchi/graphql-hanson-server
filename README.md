@@ -220,3 +220,40 @@ mutation {
   }
 }
 ```
+
+### 認証済みのユーザのみリンクを作成する
+ログインするとJWTトークンが生成されるため、これを利用する。  
+まずはPlaygroundのHTTP HEADERに以下のようなヘッダを作成する。  
+※あらかじめloginしておく。  
+
+※値はloginした時に取得したJWTトークンを利用する。  
+```
+{
+  "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDgwODYyNTUsInVzZXJuYW1lIjoidXNlcjEifQ.Ce6rfJLrEzssU5dnHH5Dx5fKeOdvIkB4ISjrYa4BIbw"
+}
+```
+
+その後、以下のようなリクエストを送る。  
+```
+mutation {
+  createLink(input: {title: "GraphQL site!!", address: "www.graphql.org"}){
+    user{
+      name
+    }
+  }
+}
+```
+
+すると、以下のような結果が取得でき、データベースのLinksテーブルに、`UserID`付きのデータがINSERTされている事が確認できる。  
+
+```
+mutation {
+  createLink(input: {title: "GraphQL site!!", address: "www.graphql.org"}){
+    user{
+      name
+    }
+  }
+}
+```
+
+※また、`links`クエリでもユーザ名を取得できるようになっている。  

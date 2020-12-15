@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"net/http"
-	"os/user"
 
 	"github.com/SRsawaguchi/graphql-hanson-server/internal/users"
 	"github.com/SRsawaguchi/graphql-hanson-server/pkg/jwt"
@@ -49,7 +48,7 @@ func Middleware(conn *pgx.Conn) func(http.Handler) http.Handler {
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *user.User {
-	raw, _ := ctx.Value(userCtxKey).(*user.User)
+func ForContext(ctx context.Context) *users.User {
+	raw, _ := ctx.Value(userCtxKey).(*users.User)
 	return raw
 }

@@ -5,20 +5,28 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/generated"
 	"github.com/SRsawaguchi/graphql-hanson-server/graph/model"
+	"github.com/SRsawaguchi/graphql-hanson-server/internal/auth"
 	"github.com/SRsawaguchi/graphql-hanson-server/internal/links"
 	"github.com/SRsawaguchi/graphql-hanson-server/internal/users"
 	"github.com/SRsawaguchi/graphql-hanson-server/pkg/jwt"
 )
 
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return &model.Link{}, fmt.Errorf("access denied")
+	}
+
 	link := links.Link{
 		Title:   input.Title,
 		Address: input.Address,
+		User:    user,
 	}
 	_, err := link.Save(ctx, r.DB)
 	if err != nil {
@@ -30,6 +38,10 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) 
 		ID:      strconv.Itoa(int(link.ID)),
 		Title:   link.Title,
 		Address: link.Address,
+		User: &model.User{
+			ID:   strconv.Itoa(user.ID),
+			Name: user.Username,
+		},
 	}, nil
 }
 
@@ -102,6 +114,10 @@ func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
 			ID:      strconv.Itoa(int(link.ID)),
 			Title:   link.Title,
 			Address: link.Address,
+			User: &model.User{
+				ID:   strconv.Itoa(link.User.ID),
+				Name: link.User.Username,
+			},
 		})
 	}
 
