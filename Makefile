@@ -1,5 +1,6 @@
 CONTAINER_NAME := hackernews
 SRV_PORT := 3020
+CLIENT_ORIGIN := http://localhost:8080
 DB_HOST := localhost
 DB_PASS := dbpass
 DB_PORT := 3306
@@ -14,6 +15,7 @@ run:
 		DB_USER=$(DB_USER) \
 		DB_NAME=$(DB_NAME) \
 		PORT=$(SRV_PORT) \
+		CLIENT_ORIGIN=$(CLIENT_ORIGIN) \
 		go run server.go
 
 .PHONY: rundb

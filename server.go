@@ -59,20 +59,24 @@ func main() {
 
 	router := chi.NewRouter()
 	router.Use(auth.Middleware(conn))
-	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8080"},
-		AllowCredentials: true,
-		Debug:            true,
-	}).Handler)
-	srv.AddTransport(&transport.Websocket{
-		Upgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
+
+	if clientOrigin := os.Getenv("CLIENT_ORIGIN"); clientOrigin != "" {
+		router.Use(cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:8080"},
+			AllowCredentials: true,
+			Debug:            true,
+		}).Handler)
+		srv.AddTransport(&transport.Websocket{
+			Upgrader: websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
+				},
+				ReadBufferSize:  1024,
+				WriteBufferSize: 1024,
 			},
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-		},
-	})
+		})
+		log.Printf("client origin: %s", clientOrigin)
+	}
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
