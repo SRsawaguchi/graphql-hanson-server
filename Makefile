@@ -1,4 +1,5 @@
 CONTAINER_NAME := hackernews
+SRV_PORT := 3020
 DB_HOST := localhost
 DB_PASS := dbpass
 DB_PORT := 3306
@@ -12,6 +13,7 @@ run:
 		DB_PASSWORD=$(DB_PASS) \
 		DB_USER=$(DB_USER) \
 		DB_NAME=$(DB_NAME) \
+		PORT=$(SRV_PORT) \
 		go run server.go
 
 .PHONY: rundb
